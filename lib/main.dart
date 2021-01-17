@@ -72,11 +72,8 @@ class MyCustomFormState extends State<MyCustomForm> {
 
 
   callAPi(city) async {
-    print('city ====> ');
-    print(city);
     var current = await WeatherModel().getCurrentWeatherWithCity(city);
     var forecast = await WeatherModel().getFiveDayForecastWithCity(city);
-    print(forecast[1].areaName);
     setState(() {
       currentData = '''
       ~~~ CURRENT WEATHER ~~~
