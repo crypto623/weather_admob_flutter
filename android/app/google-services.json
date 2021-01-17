@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "917377717670",
+    "project_id": "weather-admob-flutter",
+    "storage_bucket": "weather-admob-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:917377717670:android:183f26009ab974e52feb67",
+        "android_client_info": {
+          "package_name": "com.example.weather_admob_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "917377717670-kl25afq0ouacq3odpnhlegbobb0pvjq4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsvml2VBa3k7xtEtKrPNqLBsG5Ov9HR_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "917377717670-kl25afq0ouacq3odpnhlegbobb0pvjq4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
