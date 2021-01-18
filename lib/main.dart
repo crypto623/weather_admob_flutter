@@ -27,68 +27,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Weather currentData;
-  List<Weather> forecastData;
-  int i = 10;
+  String param = 'Sydney';
   WeatherModel weatherModel = new WeatherModel();
-
-  callAPi(data) async {
-    var city = data + ', AU';
-    var current = await WeatherModel().getCurrentWeatherWithCity(city);
-    var forecast = await WeatherModel().getFiveDayForecastWithCity(city);
-    setState(() {
-      currentData = current;
-      i = i + 10;
-      print('===================>');
-      print(currentData.areaName);
-      forecastData = forecast;
-      // currentData = '''
-      // ~~~ CURRENT WEATHER ~~~
-
-      // Place Name: ${current.areaName} [${current.country}]
-      // Date: ${current.date}
-      // Weather: ${current.weatherDescription}
-      // Temp: ${current.temperature}
-      // Wind: speed ${current.windSpeed}, degree: ${current.windDegree}
-      // Weather Condition code: ${current.weatherConditionCode}
-
-      // ''';
-      // forecastData = '''
-      // ~~~ FORECAST WEATHER ~~~
-
-      // Date: ${forecast[0].date}
-      // Weather: ${forecast[0].weatherDescription}
-      // Temp: ${forecast[0].temperature}
-      // Wind: speed ${forecast[0].windSpeed}, degree: ${forecast[0].windDegree}
-      // Weather Condition code: ${forecast[0].weatherConditionCode}
-
-      // Date: ${forecast[1].date}
-      // Weather: ${forecast[1].weatherDescription}
-      // Temp: ${forecast[1].temperature}
-      // Wind: speed ${forecast[1].windSpeed}, degree: ${forecast[1].windDegree}
-      // Weather Condition code: ${forecast[1].weatherConditionCode}
-
-      // Date: ${forecast[2].date}
-      // Weather: ${forecast[2].weatherDescription}
-      // Temp: ${forecast[2].temperature}
-      // Wind: speed ${forecast[2].windSpeed}, degree: ${forecast[2].windDegree}
-      // Weather Condition code: ${forecast[2].weatherConditionCode}
-
-      // Date: ${forecast[3].date}
-      // Weather: ${forecast[3].weatherDescription}
-      // Temp: ${forecast[3].temperature}
-      // Wind: speed ${forecast[3].windSpeed}, degree: ${forecast[3].windDegree}
-      // Weather Condition code: ${forecast[3].weatherConditionCode}
-
-      // Date: ${forecast[4].date}
-      // Weather: ${forecast[4].weatherDescription}
-      // Temp: ${forecast[4].temperature}
-      // Wind: speed ${forecast[4].windSpeed}, degree: ${forecast[4].windDegree}
-      // Weather Condition code: ${forecast[4].weatherConditionCode}
-
-      // ''';
-    });
-  }
 
   // Admob integration
   BannerAd myBanner;
@@ -112,7 +52,7 @@ class _HomePageState extends State<HomePage> {
     // FirebaseAdMob.instance.initialize(appId:"YOUR_APPID");
     FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
     myBanner = buildBannerAd()..load();
-    callAPi("Sydney");
+    // callAPi("Sydney");
   }
 
   @override
@@ -150,7 +90,10 @@ class _HomePageState extends State<HomePage> {
             ),
             DropdownSearch<String>(
               mode: Mode.MENU,
+              maxHeight: 300,
               showSelectedItem: true,
+              dropdownSearchDecoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0)),
               items: [
                 "Sydney",
                 "Albury",
@@ -176,13 +119,22 @@ class _HomePageState extends State<HomePage> {
               ],
               label: "City Name *",
               onChanged: (data) {
-                callAPi(data);
+                setState(() {
+                  param = data;
+                });
               },
               selectedItem: "Sydney",
             ),
-            // Text('${(currentData)}', style: TextStyle(height: 1.4)),
-            // Text('${(forecastData)}', style: TextStyle(height: 1.4)),
-            CurrentTableWidget(currentData : currentData, i: i),
+            CurrentTableWidget(param: param),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 20,
+                bottom: 0,
+              ),
+              child: Text("Forecast Weather",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+            ForecastTableWidget(param: param),
           ],
         ),
       ),
@@ -190,72 +142,190 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// CurrentTable
 class CurrentTableWidget extends StatefulWidget {
-  final Weather currentData;
-  final int i;
-  CurrentTableWidget({Key key, @required this.currentData, @required this.i})
-      : super(key: key);
+  final String param;
+  CurrentTableWidget({Key key, @required this.param}) : super(key: key);
   @override
-  _CurrentTableWidgetState createState() =>
-      _CurrentTableWidgetState(currentData, i);
+  _CurrentTableWidgetState createState() => _CurrentTableWidgetState(param);
 }
 
 class _CurrentTableWidgetState extends State<CurrentTableWidget> {
-  final Weather currentData;
-  final int i;
-  _CurrentTableWidgetState(this.currentData, this.i);
+  final String param;
+  _CurrentTableWidgetState(this.param);
+  Weather currentData;
   @override
   void initState() {
     super.initState();
-    print('----------------------------------------------------------------');
-    print(currentData);
+    this.callAPI(this.widget.param);
   }
 
   @override
   void didUpdateWidget(CurrentTableWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    print(currentData);
-    print(i);
+    this.callAPI(this.widget.param);
+  }
+
+  callAPI(data) async {
+    var city = data + ', AU';
+    var current = await WeatherModel().getCurrentWeatherWithCity(city);
+    setState(() {
+      currentData = current;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: currentData != null ? Text(i.toString() + 'sdfsf') : Text('null'),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            dataRowHeight: 30,
+            columnSpacing: 0,
+            horizontalMargin: 0,
+            columns: [
+              DataColumn(label: Text('Current Weather')),
+              DataColumn(label: Text('')),
+            ],
+            rows: [
+              DataRow(cells: [
+                DataCell(Text("Date")),
+                DataCell(Text(currentData.date.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Description")),
+                DataCell(Text(currentData.weatherDescription.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Temp")),
+                DataCell(Text(currentData.temperature.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Temp (min)")),
+                DataCell(Text(currentData.tempMin.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Temp (max)")),
+                DataCell(Text(currentData.tempMax.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Sunrise")),
+                DataCell(Text(currentData.sunrise.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Sunset")),
+                DataCell(Text(currentData.sunset.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Wind Speed")),
+                DataCell(Text(currentData.windSpeed.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Wind Degree")),
+                DataCell(Text(currentData.windDegree.toString())),
+              ]),
+              DataRow(cells: [
+                DataCell(Text("Condition code")),
+                DataCell(Text(currentData.weatherConditionCode.toString())),
+              ]),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
 
-// class DataTableWidget extends StatelessWidget {
+// ForecastTable
+class ForecastTableWidget extends StatefulWidget {
+  final String param;
+  ForecastTableWidget({Key key, @required this.param}) : super(key: key);
+  @override
+  _ForecastTableWidgetState createState() => _ForecastTableWidgetState(param);
+}
 
-//   final List<Map<String, String>> listOfColumns = [
-//     {"Name": "AAAAAA", "Number": "1", "State": "Yes"},
-//     {"Name": "BBBBBB", "Number": "2", "State": "no"},
-//     {"Name": "CCCCCC", "Number": "3", "State": "Yes"}
-//   ];
-//   print
-// //  DataTableWidget(this.listOfColumns);     // Getting the data from outside, on initialization
-//   @override
-//   Widget build(BuildContext context) {
-//     return DataTable(
-//       columns: [
-//         DataColumn(label: Text('Patch')),
-//         DataColumn(label: Text('Version')),
-//         DataColumn(label: Text('Ready')),
-//       ],
-//       rows:
-//           listOfColumns // Loops through dataColumnText, each iteration assigning the value to element
-//               .map(
-//                 ((element) => DataRow(
-//                       cells: <DataCell>[
-//                         DataCell(Text(element["Name"])), //Extracting from Map element the value
-//                         DataCell(Text(element["Number"])),
-//                         DataCell(Text(element["State"])),
-//                       ],
-//                     )),
-//               )
-//               .toList(),
-//     );
-//   }
-// }
+class _ForecastTableWidgetState extends State<ForecastTableWidget> {
+  final String param;
+  _ForecastTableWidgetState(this.param);
+  List<Weather> forecastData;
+  @override
+  void initState() {
+    super.initState();
+    this.callAPI(this.widget.param);
+  }
+
+  @override
+  void didUpdateWidget(ForecastTableWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    this.callAPI(this.widget.param);
+  }
+
+  callAPI(data) async {
+    var city = data + ', AU';
+    var forecast = await WeatherModel().getFiveDayForecastWithCity(city);
+    setState(() {
+      if (forecast == null)
+        forecastData = [];
+      else {
+        List<Weather> let = [
+          forecast[0],
+          forecast[8],
+          forecast[16],
+          forecast[24],
+          forecast[32],
+          forecast[39]
+        ];
+        forecastData = let;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            dataRowHeight: 30,
+            columnSpacing: 5,
+            horizontalMargin: 0,
+            columns: [
+              DataColumn(label: Text('Date')),
+              DataColumn(label: Text('Description')),
+              DataColumn(label: Text('Temp')),
+              DataColumn(label: Text('Temp (min)')),
+              DataColumn(label: Text('Temp (max)')),
+              DataColumn(label: Text('Wind Speed')),
+              DataColumn(label: Text('Wind Degree')),
+              DataColumn(label: Text('Condition code')),
+            ],
+            rows:
+                forecastData // Loops through dataColumnText, each iteration assigning the value to element
+                    .map(
+                      ((element) => DataRow(
+                            cells: <DataCell>[
+                              DataCell(Text(
+                                  element.date.toString().substring(0, 10))),
+                              DataCell(
+                                  Text(element.weatherDescription.toString())),
+                              DataCell(Text(element.temperature.toString())),
+                              DataCell(Text(element.tempMin.toString())),
+                              DataCell(Text(element.tempMax.toString())),
+                              DataCell(Text(element.windSpeed.toString())),
+                              DataCell(Text(element.windDegree.toString())),
+                              DataCell(Text(
+                                  element.weatherConditionCode.toString())),
+                            ],
+                          )),
+                    )
+                    .toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
