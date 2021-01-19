@@ -170,7 +170,13 @@ class _CurrentTableWidgetState extends State<CurrentTableWidget> {
     var city = data + ', AU';
     var current = await WeatherModel().getCurrentWeatherWithCity(city);
     setState(() {
-      currentData = current;
+      if (current == null) {
+        currentData = new Weather(null);
+      } else {
+        currentData = current;
+        print("=============<<<<<<<<<<<");
+        print(currentData);
+      }
     });
   }
 
@@ -181,57 +187,60 @@ class _CurrentTableWidgetState extends State<CurrentTableWidget> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
-            dataRowHeight: 30,
-            columnSpacing: 0,
-            horizontalMargin: 0,
-            columns: [
-              DataColumn(label: Text('Current Weather')),
-              DataColumn(label: Text('')),
-            ],
-            rows: [
-              DataRow(cells: [
-                DataCell(Text("Date")),
-                DataCell(Text(currentData.date.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Description")),
-                DataCell(Text(currentData.weatherDescription.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Temp")),
-                DataCell(Text(currentData.temperature.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Temp (min)")),
-                DataCell(Text(currentData.tempMin.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Temp (max)")),
-                DataCell(Text(currentData.tempMax.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Sunrise")),
-                DataCell(Text(currentData.sunrise.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Sunset")),
-                DataCell(Text(currentData.sunset.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Wind Speed")),
-                DataCell(Text(currentData.windSpeed.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Wind Degree")),
-                DataCell(Text(currentData.windDegree.toString())),
-              ]),
-              DataRow(cells: [
-                DataCell(Text("Condition code")),
-                DataCell(Text(currentData.weatherConditionCode.toString())),
-              ]),
-            ],
-          ),
+          child: currentData != null
+              ? DataTable(
+                  dataRowHeight: 30,
+                  columnSpacing: 0,
+                  horizontalMargin: 0,
+                  columns: [
+                    DataColumn(label: Text('Current Weather')),
+                    DataColumn(label: Text('')),
+                  ],
+                  rows: [
+                    DataRow(cells: [
+                      DataCell(Text("Date")),
+                      DataCell(Text(currentData.date.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Description")),
+                      DataCell(Text(currentData.weatherDescription.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Temp")),
+                      DataCell(Text(currentData.temperature.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Temp (min)")),
+                      DataCell(Text(currentData.tempMin.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Temp (max)")),
+                      DataCell(Text(currentData.tempMax.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Sunrise")),
+                      DataCell(Text(currentData.sunrise.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Sunset")),
+                      DataCell(Text(currentData.sunset.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Wind Speed")),
+                      DataCell(Text(currentData.windSpeed.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Wind Degree")),
+                      DataCell(Text(currentData.windDegree.toString())),
+                    ]),
+                    DataRow(cells: [
+                      DataCell(Text("Condition code")),
+                      DataCell(
+                          Text(currentData.weatherConditionCode.toString())),
+                    ]),
+                  ],
+                )
+              : Text(''),
         ),
       ),
     );
@@ -278,6 +287,8 @@ class _ForecastTableWidgetState extends State<ForecastTableWidget> {
           forecast[39]
         ];
         forecastData = let;
+        print('=============>>>>>>>>>>>>>>>>>>>>>');
+        print(forecastData);
       }
     });
   }
@@ -303,8 +314,7 @@ class _ForecastTableWidgetState extends State<ForecastTableWidget> {
               DataColumn(label: Text('Wind Degree')),
               DataColumn(label: Text('Condition code')),
             ],
-            rows:
-                forecastData // Loops through dataColumnText, each iteration assigning the value to element
+            rows: forecastData != null?forecastData // Loops through dataColumnText, each iteration assigning the value to element
                     .map(
                       ((element) => DataRow(
                             cells: <DataCell>[
@@ -322,7 +332,8 @@ class _ForecastTableWidgetState extends State<ForecastTableWidget> {
                             ],
                           )),
                     )
-                    .toList(),
+                    .toList()
+                : [],
           ),
         ),
       ),
